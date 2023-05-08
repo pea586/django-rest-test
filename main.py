@@ -17,3 +17,6 @@ if __name__ == '__main__':
 def hello_world():
     return 'Hello world.'
 
+print(hello_world())
+
+# delete this file later
