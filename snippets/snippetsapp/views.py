@@ -8,15 +8,22 @@ from django.shortcuts import render
 
 
 from snippetsapp.models import Snippet
-from snippetsapp.serializers import SnippetSerializer
+from snippetsapp.serializers import SnippetSerializer, UserSerializer
 from rest_framework import generics
+
 from rest_framework import permissions
 
+from django.contrib.auth.models import User
 
-class SnippetList(generics.ListCreateAPIView):
+
+class SnippetList(generics.ListCreateAPIView): #这个类名称，会显示在api界面
+    """List and Create"""
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
-    permission_classes = (permissions.IsAdminUser,) # cautions this comma ",", without it or have blank " " would result in error
+    # permission_classes = (permissions.IsAdminUser,) # cautions this comma ",", without it or have blank " " would result in error
+
+    def perform_create(self, serializer):
+        serializer.save(owner=self.request.user)
 
 
 class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
@@ -24,6 +31,28 @@ class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = SnippetSerializer
 
 
+class UserList(generics.ListCreateAPIView): #这个类名称，会显示在api界面
+    """List and Create user"""
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
+
+from rest_framework import renderers
+from rest_framework.response import Response
+
+
+class SnippetHighlight(generics.GenericAPIView):
+    queryset = Snippet.objects.all()
+    renderer_classes = (renderers.StaticHTMLRenderer,)
+
+    def get(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
 
 #
 # from snippetsapp.models import Snippet

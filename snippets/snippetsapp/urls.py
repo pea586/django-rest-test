@@ -29,6 +29,12 @@ from snippetsapp import views
 urlpatterns = [
     path('snippets/', views.SnippetList.as_view(), name='snippet-list'),
     path('snippets/<int:pk>', views.SnippetDetail.as_view(), name='snippet-detail'),
+
+    path('users/', views.UserList.as_view(), name='user-list'),
+    path('users/<int:pk>', views.UserDetail.as_view(), name='user-detail'),
+
+    path('snippets/<int:pk>/highlight', views.SnippetHighlight.as_view(), name='snippet-highlight'),
+# 此行/highlight/是地址栏里需要输入的后缀
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

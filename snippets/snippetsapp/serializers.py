@@ -1,13 +1,19 @@
 from rest_framework import serializers
 from snippetsapp.models import Snippet, LANGUAGE_CHOICES, STYLE_CHOICES
 
+from django.contrib.auth.models import User
 
 
 class SnippetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Snippet
-        fields = ['id', 'title', 'code', 'linenos', 'language', 'style'] # 1, 6-9行可代替13-37行的全部功能； 2， bili课程里，fields = （。。。），用的是元组，非列表
+        fields = ['id', 'title', 'code', 'linenos', 'language', 'style', 'owner', 'highlighted', ] # 1, 6-9行可代替13-37行的全部功能； 2， bili课程里，fields = （。。。），用的是元组，非列表
 
+
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', ]
 
 
 # class SnippetSerializer(serializers.Serializer):
