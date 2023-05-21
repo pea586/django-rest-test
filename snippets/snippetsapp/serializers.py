@@ -8,6 +8,7 @@ class SnippetSerializer(serializers.ModelSerializer):
     class Meta:
         model = Snippet
         fields = ['id', 'title', 'code', 'linenos', 'language', 'style', 'owner', 'highlighted', ] # 1, 6-9行可代替13-37行的全部功能； 2， bili课程里，fields = （。。。），用的是元组，非列表
+        read_only_fields = ['owner', 'highlighted'] # 实现api接口的显示owner，但不能修改owner功能
 
 
 class UserSerializer(serializers.ModelSerializer):

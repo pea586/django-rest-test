@@ -7,52 +7,100 @@ from django.shortcuts import render
 
 
 
+from rest_framework.decorators import detail_route
+from rest_framework.response import Response
+from rest_framework import viewsets
+
 from snippetsapp.models import Snippet
-from snippetsapp.serializers import SnippetSerializer, UserSerializer
-from rest_framework import generics
-
+from snippetsapp.serializers import SnippetSerializer
 from rest_framework import permissions
+from rest_framework import renderers
 
-from django.contrib.auth.models import User
 
-
-class SnippetList(generics.ListCreateAPIView): #这个类名称，会显示在api界面
-    """List and Create"""
+class SnippetViewSet(viewsets.ModelViewSet):
     queryset = Snippet.objects.all()
     serializer_class = SnippetSerializer
-    # permission_classes = (permissions.IsAdminUser,) # cautions this comma ",", without it or have blank " " would result in error
+
+    @detail_route(renderer_classes=[renderers.StaticHTMLRenderer]) # 此处可用新版@action代替
+    def highlight(self, request, *args, **kwargs):
+        snippet = self.get_object()
+        return Response(snippet.highlighted)
 
     def perform_create(self, serializer):
         serializer.save(owner=self.request.user)
 
 
-class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Snippet.objects.all()
-    serializer_class = SnippetSerializer
+from django.contrib.auth.models import User
+from snippetsapp.serializers import UserSerializer
 
 
-class UserList(generics.ListCreateAPIView): #这个类名称，会显示在api界面
-    """List and Create user"""
+class UserViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
 
 
-class UserDetail(generics.RetrieveUpdateDestroyAPIView):
-    queryset = User.objects.all()
-    serializer_class = UserSerializer
 
+# from snippetsapp.models import Snippet
+# from snippetsapp.serializers import SnippetSerializer, UserSerializer
+# from rest_framework import generics
+#
+# from rest_framework import permissions
+#
+# from django.contrib.auth.models import User
+#
+#
+# class SnippetList(generics.ListCreateAPIView): #这个类名称，会显示在api界面
+#     """List and Create"""
+#     queryset = Snippet.objects.all()
+#     serializer_class = SnippetSerializer
+#     # permission_classes = (permissions.IsAdminUser,) # cautions this comma ",", without it or have blank " " would result in error
+#
+#     def perform_create(self, serializer):
+#         serializer.save(owner=self.request.user)
+#
+#
+# class SnippetDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = Snippet.objects.all()
+#     serializer_class = SnippetSerializer
+#
+#
+# class UserList(generics.ListCreateAPIView): #这个类名称，会显示在api界面
+#     """List and Create user"""
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#
+#
+# class UserDetail(generics.RetrieveUpdateDestroyAPIView):
+#     queryset = User.objects.all()
+#     serializer_class = UserSerializer
+#
+#
+# from rest_framework import renderers
+# from rest_framework.response import Response
+#
+#
+# class SnippetHighlight(generics.GenericAPIView):
+#     queryset = Snippet.objects.all()
+#     renderer_classes = (renderers.StaticHTMLRenderer,)
+#
+#     def get(self, request, *args, **kwargs):
+#         snippet = self.get_object()
+#         return Response(snippet.highlighted)
+#
+#
+#
 
-from rest_framework import renderers
+from rest_framework.decorators import api_view
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 
 
-class SnippetHighlight(generics.GenericAPIView):
-    queryset = Snippet.objects.all()
-    renderer_classes = (renderers.StaticHTMLRenderer,)
-
-    def get(self, request, *args, **kwargs):
-        snippet = self.get_object()
-        return Response(snippet.highlighted)
+@api_view(['GET'])
+def api_root(request, format=None):
+    return Response({
+        'user':reverse('user-list', request=request, format=format),
+        'snippets': reverse('snippet-list', request=request, format=format)
+    })
 
 #
 # from snippetsapp.models import Snippet
