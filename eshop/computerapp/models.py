@@ -84,7 +84,7 @@ class UserProfile(models.Model):
     created = models.DateTimeField(auto_now_add=True)
     updated = models.DateTimeField(auto_now=True)
     delivery_address = models.ForeignKey(DeliveryAddress, related_name='user_delivery_address', on_delete=models.CASCADE,
-                                         blank=True, null=True, )
+                                         blank=True, null=True, ) # 此处指默认送货地址。
 
 
 
@@ -102,7 +102,7 @@ class Order(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='order_of', )
     remark = models.TextField(blank=True, null=True)
     product = models.ForeignKey(Product, related_name='order_product', on_delete=models.CASCADE)
-    price = models.DecimalField(max_digits=12, decimal_places=2)
+    price = models.DecimalField(max_digits=12, decimal_places=2) # 此价格代表下单时的价格，可能与Product的price不同
     quantity = models.PositiveIntegerField(default=1)
     address = models.ForeignKey(DeliveryAddress, related_name='order_address', on_delete=models.CASCADE)
     created = models.DateTimeField(auto_now_add=True)
