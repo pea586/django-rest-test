@@ -23,3 +23,24 @@ class ProductListView(generics.ListAPIView):
     search_fields = ('description', 'category', )
     ordering = ('id', )
     pagination_class = LimitOffsetPagination # 实现分页功能的调整
+
+
+class ProductListByCategoryView(generics.ListAPIView):
+    """产品按类别列表"""
+    serializer_class = ProductListSerializer
+    permission_classes = (permissions.AllowAny,)
+    filter_backends = (SearchFilter, OrderingFilter, )
+    search_fields = ('description', )
+    ordering_fields = ('category', 'manufacturer', 'created', 'sold', 'stock', 'price', )
+    ordering = ('id', )
+
+    def get_queryset(self):
+        category = self.request.query_params.get('category', None)
+
+        if category is not None:
+            queryset = Product.objects.filter(category = category)
+        else:
+            queryset = Product.objects.all()
+        return queryset
+
+
