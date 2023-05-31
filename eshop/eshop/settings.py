@@ -38,6 +38,8 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
+    'rest_framework.authtoken',
+    # 'django_filters', # 根据bili课程，不一定用。故文本化
     'computerapp.apps.ComputerappConfig',
 ]
 
@@ -128,6 +130,11 @@ MEDIA_ROOT = os.path.join(os.path.dirname(BASE_DIR), 'eshop/media')
 REST_FRAMEWORK = { # 实现分页功能
     'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.LimitOffsetPagination',
     'PAGE_SIZE' : 6,
+    'DEFAULT_AUTHENTICATION_CLASSES':(
+        'rest_framework.authentication.BasicAuthentication',
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    )
     # 'DEFAULT_PERMISSION_CLASSES': [
     #     'rest_framework.permissions.IsAdminUser',
     # ],

@@ -6,9 +6,11 @@ from rest_framework import generics
 from rest_framework import permissions
 from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 from computerapp.models import Product
-from computerapp.serializers import ProductListSerializer, ProductRetrieveSerializer
+from computerapp.serializers import ProductListSerializer, ProductRetrieveSerializer, UserInfoSerializer
 
 
 
@@ -70,3 +72,12 @@ class ProductRetrieveView(generics.RetrieveAPIView): # 可以改成generics.List
     serializer_class = ProductRetrieveSerializer
     permission_classes = (permissions.AllowAny, )
 
+
+class UserInfoView(APIView):
+    """用户基本信息"""
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get(self, request, format=None):
+        user = self.request.user # 把当前用户的信息赋值给user，确保最后返回的data是当前用户的。避免查看别人的信息
+        serializer = UserInfoSerializer(user)
+        return Response(serializer.data)

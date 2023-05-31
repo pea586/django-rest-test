@@ -3,7 +3,25 @@ import collections
 from rest_framework import serializers
 
 
-from computerapp.models import Product, Manufacturer, Category
+from computerapp.models import Product, Manufacturer, Category, UserProfile
+
+from django.contrib.auth.models import User
+
+
+class UserProfileSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = UserProfile
+        fields = ['id', 'user', 'mobile_phone', 'nickname', 'description', 'icon', 'created', 'updated', ]
+        read_only_fields = ('user', )
+
+
+class UserInfoSerializer(serializers.ModelSerializer):
+    profile_of = UserProfileSerializer()
+
+    class Meta:
+        model = User
+        fields = ['id', 'username', 'email', 'first_name', 'last_name', 'date_joined', 'profile_of', ]
 
 
 class ManufacturerSerializer(serializers.ModelSerializer):
