@@ -8,7 +8,7 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 
 from computerapp.models import Product
-from computerapp.serializers import ProductListSerializer
+from computerapp.serializers import ProductListSerializer, ProductRetrieveSerializer
 
 
 
@@ -43,4 +43,30 @@ class ProductListByCategoryView(generics.ListAPIView):
             queryset = Product.objects.all()
         return queryset
 
+
+class ProductListByCategoryManufacturerView(generics.ListAPIView):
+    """产品按类别按品牌列表"""
+    serializer_class = ProductListSerializer
+    permission_classes = (permissions.AllowAny,)
+    filter_backends = (SearchFilter, OrderingFilter, )
+    search_fields = ('description', )
+    ordering_fields = ('category', 'manufacturer', 'created', 'sold', 'stock', 'price', )
+    ordering = ('id', )
+
+    def get_queryset(self):
+        category = self.request.query_params.get('category', None)
+        manufacturer = self.request.query_params.get('manufacturer', None)
+
+        if category is not None:
+            queryset = Product.objects.filter(category = category, manufacturer=manufacturer)
+        else:
+            queryset = Product.objects.all()
+        return queryset
+
+
+class ProductRetrieveView(generics.RetrieveAPIView): # 可以改成generics.ListAPIView，效果为全部显示出来
+    """详情页面"""
+    queryset = Product.objects.all()
+    serializer_class = ProductRetrieveSerializer
+    permission_classes = (permissions.AllowAny, )
 
