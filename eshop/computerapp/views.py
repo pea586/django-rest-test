@@ -10,7 +10,8 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 
 from computerapp.models import Product
-from computerapp.serializers import ProductListSerializer, ProductRetrieveSerializer, UserInfoSerializer
+from computerapp.serializers import ProductListSerializer, ProductRetrieveSerializer, UserInfoSerializer, \
+    UserSerializer
 
 
 
@@ -81,3 +82,8 @@ class UserInfoView(APIView):
         user = self.request.user # 把当前用户的信息赋值给user，确保最后返回的data是当前用户的。避免查看别人的信息
         serializer = UserInfoSerializer(user)
         return Response(serializer.data)
+
+
+class UserCreateView(generics.CreateAPIView):
+    """用户创建（用户注册）"""
+    serializer_class = UserSerializer

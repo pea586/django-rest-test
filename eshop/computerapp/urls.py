@@ -15,6 +15,9 @@ urlpatterns = [
     path('product_retrieve/<int:pk>/', views.ProductRetrieveView.as_view(), name='product_retrieve'),
 
     path('user_info/', views.UserInfoView.as_view(), name='user_info'),
+
+    path('user_create', views.UserCreateView.as_view(), name='user_create'),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)
