@@ -16,7 +16,12 @@ urlpatterns = [
 
     path('user_info/', views.UserInfoView.as_view(), name='user_info'),
 
-    path('user_create', views.UserCreateView.as_view(), name='user_create'),
+    path('user_create/', views.UserCreateView.as_view(), name='user_create'),
+
+    path('delivery_address_lc/', views.DeliveryAddressLCView.as_view(), name='delivery_address_lc'),
+
+    path('delivery_address_rud/<int:pk>/', views.DeliveryAddressRUDView.as_view(),
+         name='delivery_address_rud'),
 
 ]
 

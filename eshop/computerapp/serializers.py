@@ -3,7 +3,7 @@ import collections
 from rest_framework import serializers
 
 
-from computerapp.models import Product, Manufacturer, Category, UserProfile
+from computerapp.models import Product, Manufacturer, Category, UserProfile, DeliveryAddress
 
 from django.contrib.auth.models import User
 
@@ -72,5 +72,10 @@ class ProductRetrieveSerializer(serializers.ModelSerializer):
                   'created', 'updated', ]
 
 
+class DeliveryAddressSerializer(serializers.ModelSerializer):
 
-
+    class Meta:
+        model = DeliveryAddress
+        fields = ['id', 'user', 'contact_person', 'contact_mobile_phone', 'delivery_address',
+                  'created', 'updated', ]
+        read_only_fields = ('user',)

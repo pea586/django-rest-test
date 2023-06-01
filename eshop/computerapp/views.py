@@ -8,10 +8,12 @@ from rest_framework.filters import OrderingFilter, SearchFilter
 from rest_framework.pagination import LimitOffsetPagination
 from rest_framework.views import APIView
 from rest_framework.response import Response
+from rest_framework.exceptions import NotFound
 
-from computerapp.models import Product
+from computerapp.models import Product, UserProfile, DeliveryAddress
+
 from computerapp.serializers import ProductListSerializer, ProductRetrieveSerializer, UserInfoSerializer, \
-    UserSerializer
+    UserSerializer, DeliveryAddressSerializer
 
 
 
@@ -87,3 +89,39 @@ class UserInfoView(APIView):
 class UserCreateView(generics.CreateAPIView):
     """用户创建（用户注册）"""
     serializer_class = UserSerializer
+
+
+class DeliveryAddressLCView(generics.ListCreateAPIView):
+    """收货地址LC"""
+    serializer_class = DeliveryAddressSerializer # 列表和详情共用一个序列器，因地址功能简单，仅电话、地址等信息
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        """确保当前用户只能查询当前用户的地址信息"""
+        user = self.request.user # 获取当前用户
+        queryset = DeliveryAddress.objects.filter(user=user)
+        return queryset
+
+    def perform_create(self, serializer):
+        """实现当前用户创建的地址只能储存在当前用户名下"""
+        user = self.request.user
+        s = serializer.save(user=user)
+        profile = user.profile_of # profile_of和models.py里的UserProfile的related_name相关联
+        profile.delivery_address = s # profile的delivery_address字段
+        profile.save()
+
+
+class DeliveryAddressRUDView(generics.RetrieveUpdateDestroyAPIView):
+    """收货地址RUD"""
+    serializer_class = DeliveryAddressSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_object(self):
+        user = self.request.user
+
+        try: # 由于一个用户可能对应多个收货地址，需要id和user完全匹配，才会返回obj
+            obj = DeliveryAddress.objects.get(id=self.kwargs['pk'], user=user) # pk是urls里的正则表达式内的pk
+        except Exception as e:
+            raise NotFound('not found')
+        return obj
+
