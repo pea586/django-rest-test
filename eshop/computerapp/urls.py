@@ -23,6 +23,14 @@ urlpatterns = [
     path('delivery_address_rud/<int:pk>/', views.DeliveryAddressRUDView.as_view(),
          name='delivery_address_rud'),
 
+    path('cart_list/', views.CartListView.as_view(), name='cart_list'),
+
+    path('order_list/', views.OrderListView.as_view(), name='order_list'),
+
+    path('order_create/', views.OrderCreateView.as_view(), name='order_create'),
+
+    path('order_rud/<int:pk>/', views.OrderRUDView.as_view(), name='order_rud'),
+
 ]
 
 urlpatterns = format_suffix_patterns(urlpatterns)

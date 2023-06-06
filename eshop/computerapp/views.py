@@ -10,10 +10,22 @@ from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework.exceptions import NotFound
 
-from computerapp.models import Product, UserProfile, DeliveryAddress
+from computerapp.models import Product, UserProfile, DeliveryAddress, Order
 
 from computerapp.serializers import ProductListSerializer, ProductRetrieveSerializer, UserInfoSerializer, \
-    UserSerializer, DeliveryAddressSerializer
+    UserSerializer, DeliveryAddressSerializer, OrderListSerializer, OrderCreateSerializer, OrderRUDSerializer
+
+
+import json
+
+import datetime
+
+import logging
+
+LOG_FILENAME = 'shop.log'
+
+# logging.basicConfig(filename=LOG_FILENAME, level=logging.DEBUG) # 与下面一行确定logging记录的最低级别
+logging.basicConfig(filename=LOG_FILENAME, level=logging.INFO)
 
 
 
@@ -125,3 +137,55 @@ class DeliveryAddressRUDView(generics.RetrieveUpdateDestroyAPIView):
             raise NotFound('not found')
         return obj
 
+
+class CartListView(generics.ListAPIView):
+    """Cart List"""
+    serializer_class = OrderListSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Order.objects.filter(user=user, status='0')
+        return queryset
+
+
+class OrderListView(generics.ListAPIView):
+    """Order list"""
+    serializer_class = OrderListSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_queryset(self):
+        user = self.request.user
+        queryset = Order.objects.filter(user=user, status__in=['1', '2', '3', '4'])
+        return queryset
+
+
+class OrderCreateView(generics.CreateAPIView):
+    """Order create"""
+    queryset = Order.objects.all()
+    serializer_class = OrderCreateSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def perform_create(self, serializer):
+        user = self.request.user
+        product = serializer.validated_data.get('product')
+        serializer.save(user=user, price=product.price,
+                        address=self.request.user.profile_of.delivery_address)
+
+        logging.info('user %d cart changed, product %d related. Time is %d.', user.id, product.id,
+                     str(datetime.datetime.now()))
+
+
+class OrderRUDView(generics.RetrieveUpdateDestroyAPIView):
+    """Order RUD"""
+    serializer_class = OrderRUDSerializer
+    permission_classes = (permissions.IsAuthenticated, )
+
+    def get_object(self):
+        user = self.request.user
+        obj = Order.objects.get(user = user, id=self.kwargs['pk'])
+        return obj
+
+    def perform_update(self, serializer):
+        user = self.request.user
+        serializer.save(user=user, status = '1') # status=1表示状态由购物车转到未付款订单，防止被修改为已支付订单

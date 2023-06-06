@@ -3,7 +3,7 @@ import collections
 from rest_framework import serializers
 
 
-from computerapp.models import Product, Manufacturer, Category, UserProfile, DeliveryAddress
+from computerapp.models import Product, Manufacturer, Category, UserProfile, DeliveryAddress, Order
 
 from django.contrib.auth.models import User
 
@@ -79,3 +79,29 @@ class DeliveryAddressSerializer(serializers.ModelSerializer):
         fields = ['id', 'user', 'contact_person', 'contact_mobile_phone', 'delivery_address',
                   'created', 'updated', ]
         read_only_fields = ('user',)
+
+
+class OrderListSerializer(serializers.ModelSerializer):
+    product = ProductListSerializer()
+    address = DeliveryAddressSerializer()
+
+    class Meta:
+        model = Order
+        fields = ['id', 'status', 'user', 'product', 'price', 'quantity', 'remark', 'address', 'created',
+                  'updated', ]
+
+
+class OrderCreateSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Order
+        fields = ['id', 'status', 'user', 'product', 'price', 'quantity', 'remark', 'address', 'created',
+                  'updated', ]
+        read_only_fields = ('user', 'price', 'address', 'status', )
+
+
+class OrderRUDSerializer(serializers.ModelSerializer):
+
+    class Meta:
+        model = Order
+        fields = ['id', ] # 更新，删除等有id就够用，所以字段这里只有id
