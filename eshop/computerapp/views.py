@@ -16,7 +16,7 @@ from computerapp.serializers import ProductListSerializer, ProductRetrieveSerial
     UserSerializer, DeliveryAddressSerializer, OrderListSerializer, OrderCreateSerializer, OrderRUDSerializer
 
 
-import json
+
 
 import datetime
 
